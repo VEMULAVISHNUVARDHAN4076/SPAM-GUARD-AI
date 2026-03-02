@@ -167,6 +167,10 @@ def home():
                          is_logged_in=is_logged_in,
                          trial_remaining=trial_remaining)
 
+@app.route("/predict", methods=["GET"])
+def predict_get():
+    return redirect(url_for('home'))
+    
 @app.route("/predict", methods=["POST"])
 def predict():
     message = request.form.get("message", "").strip()
