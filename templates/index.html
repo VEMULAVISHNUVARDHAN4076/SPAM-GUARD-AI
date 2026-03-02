@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>SpamGuard AI – Message Scanner</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <style>
+        :root {
+            --bg-start: #3b82f6;
+            --bg-end: #06b6d4;
+            --card-bg: rgba(255, 255, 255, 0.94);
+            --shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+            --accent: #3b82f6;
+            --success-light: #d1fae5;
+            --success-border: #34d399;
+            --success-text: #065f46;
+            --danger-light: #fee2e2;
+            --danger-border: #f87171;
+            --danger-text: #991b1b;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--bg-start), var(--bg-end));
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+            padding-top: 90px; /* ← only added this line to prevent overlap */
+        }
+        /* ── Added only this block for top-right positioning ── */
+        .top-right-auth {
+            position: fixed;
+            top: 20px;
+            right: 24px;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
+            padding: 0.7rem 1.4rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+            border: 1px solid rgba(255,255,255,0.6);
+        }
+        .container { width: 100%; max-width: 580px; animation: fadeInUp 0.8s ease-out forwards; }
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border-radius: 1.5rem;
+            padding: 2.5rem 2rem;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255,255,255,0.4);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 30px 70px rgba(0,0,0,0.18);
+        }
+        .header { text-align: center; margin-bottom: 1.8rem; }
+        h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #1e40af, #0891b2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.4rem;
+        }
+        .status { font-size: 1.05rem; margin-bottom: 0.8rem; }
+        .trial-info { color: #d97706; font-weight: 500; }
+        .user-info { color: #059669; font-weight: 600; }
+        .auth-btn {
+            padding: 0.6rem 1.4rem;
+            border-radius: 0.6rem;
+            font-weight: 500;
+            text-decoration: none;
+            margin-left: 1rem;
+            transition: all 0.3s ease;
+        }
+        .auth-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+        }
+        .login-btn { background: #3b82f6; color: white; }
+        .logout-btn { background: #ef4444; color: white; }
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 1.2rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 1rem;
+            font-size: 1.05rem;
+            resize: vertical;
+            background: rgba(255,255,255,0.75);
+            transition: all 0.3s ease;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(59,130,246,0.18);
+            transform: scale(1.005);
+        }
+        .btn {
+            width: 100%;
+            padding: 1.1rem;
+            margin-top: 1.3rem;
+            background: linear-gradient(90deg, #3b82f6, #0ea5e9);
+            color: white;
+            font-weight: 600;
+            font-size: 1.12rem;
+            border: none;
+            border-radius: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 14px 35px rgba(59,130,246,0.5);
+        }
+        .result-box {
+            margin-top: 2rem;
+            padding: 1.8rem;
+            border-radius: 1.2rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+            text-align: center;
+            border-width: 2px;
+            border-style: solid;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+        .result-box.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .result-spam { background: var(--danger-light); color: var(--danger-text); border-color: var(--danger-border); }
+        .result-safe { background: var(--success-light); color: var(--success-text); border-color: var(--success-border); }
+        .result-icon {
+            font-size: 3.2rem;
+            margin-bottom: 0.8rem;
+            display: block;
+            animation: pulse 2s infinite ease-in-out;
+        }
+        .confidence {
+            margin-top: 0.7rem;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        .examples { margin-top: 2.5rem; }
+        .examples h3 { text-align: center; color: #374151; margin-bottom: 1.2rem; }
+        .example {
+            background: rgba(255,255,255,0.6);
+            border-radius: 1rem;
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s ease;
+        }
+        .example:hover {
+            background: white;
+            transform: translateX(6px) scale(1.02);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+        }
+        .example-type { font-weight: 700; margin-bottom: 0.4rem; }
+        .spam-type { color: #dc2626; }
+        .safe-type { color: #059669; }
+        .flash {
+            padding: 0.8rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1.2rem;
+            text-align: center;
+            animation: fadeIn 0.6s ease;
+        }
+        .success { background: #d1fae5; color: #065f46; }
+        .danger { background: #fee2e2; color: #991b1b; }
+        .warning { background: #fef3c7; color: #92400e; }
+        .info { background: #dbeafe; color: #1e40af; }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+    </style>
+</head>
+<body>
+<!-- Updated top-right block for trial mode -->
+<div class="top-right-auth">
+    {% if is_logged_in %}
+        <span class="status user-info">
+            Welcome, {{ username }}
+        </span>
+        <a href="{{ url_for('logout') }}" class="auth-btn logout-btn">Logout</a>
+    {% else %}
+        <span class="status trial-info">
+            {% if trial_remaining > 0 %}
+                Trial mode • {{ trial_remaining }} checks remaining
+            {% else %}
+                Trial ended • Login to continue
+            {% endif %}
+        </span>
+        <a href="{{ url_for('login') }}" class="auth-btn login-btn">Login</a>
+    {% endif %}
+</div>
+<div class="container">
+    <div class="card">
+        <div class="header">
+            <h1>SpamGuard AI</h1>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                {% for category, message in messages %}
+                  <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+        </div>
+        <form action="/predict" method="post">
+            <textarea name="message" placeholder="Paste or type your message here..." required></textarea>
+            <button type="submit" class="btn">Check Message</button>
+        </form>
+        {% if result %}
+        <div class="result-box {% if is_spam %}result-spam{% else %}result-safe{% endif %} show">
+            <span class="result-icon">{% if is_spam %}⚠️{% else %}✅{% endif %}</span>
+            <div>{{ result }}</div>
+            <div class="confidence">{{ prob }}% confidence</div>
+        </div>
+        {% endif %}
+
+        {% if url_results %}
+        <div class="result-box" style="margin-top: 1.8rem; background: #fef3c7; border-color: #fbbf24; padding: 1.4rem;">
+            <h3 style="color: #92400e;">⚠️ Link Safety Check (Important!)</h3>
+            {% for item in url_results %}
+            <div style="margin-bottom: 1rem; padding: 0.9rem; border-radius: 0.7rem; 
+                        background: {% if item.status == 'MALICIOUS' %}#fee2e2{% elif item.status == 'SAFE' %}#ecfdf5{% else %}#fef3c7{% endif %};
+                        color: {% if item.status == 'MALICIOUS' %}#991b1b{% elif item.status == 'SAFE' %}#065f46{% else %}#92400e{% endif %}; border: 1px solid {% if item.status == 'MALICIOUS' %}#f87171{% elif item.status == 'SAFE' %}#34d399{% else %}#fbbf24{% endif %};">
+                <strong style="word-break: break-all;">{{ item.url }}</strong><br>
+                <strong style="color: {% if item.status == 'MALICIOUS' %}#dc2626{% else %}#059669{% endif %}">
+                    {{ item.status }}
+                </strong> 
+                <small>({{ item.reason }})</small>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="examples">
+            <h3>Quick Test Examples</h3>
+            <div class="example" onclick="document.querySelector('textarea').value = this.querySelector('.msg').innerText;">
+                <div class="example-type spam-type">Spam – Fake Delivery</div>
+                <div class="msg">Your parcel is held at customs. Pay ₹249 clearance fee now: bit.ly/urgent-pay</div>
+            </div>
+            <div class="example" onclick="document.querySelector('textarea').value = this.querySelector('.msg').innerText;">
+                <div class="example-type safe-type">Normal message</div>
+                <div class="msg">Hey bro, match at 7 PM today? Don't be late!</div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
