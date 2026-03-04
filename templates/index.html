@@ -244,7 +244,7 @@
 	</form>
 
 	{% if url_result %}
-	<div class="result-box" style="margin-top:1.5rem; background:#f3f4f6; border-color:#9ca3af; padding:1.4rem;">
+	<div class="result-box show" style="margin-top:1.5rem; background:#f3f4f6; border-color:#9ca3af; padding:1.4rem;">
     		<h3 style="margin-bottom:1rem; color:#374151;">🔗 URL Safety Check</h3>
     		<div style="padding:0.9rem; border-radius:0.7rem; background:{% if url_status == 'MALICIOUS' %}#fee2e2{% else %}#ecfdf5{% endif %}; color:{% if url_status == 'MALICIOUS' %}#991b1b{% else %}#065f46{% endif %}; border:1px solid {% if url_status == 'MALICIOUS' %}#f87171{% else %}#34d399{% endif %};">
         		<strong style="word-break:break-all;">{{ checked_url }}</strong><br>
