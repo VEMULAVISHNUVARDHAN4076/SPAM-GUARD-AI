@@ -38,7 +38,7 @@ init_db()
 
 @app.before_request
 def enforce_trial_limit():
-    if request.endpoint == 'predict' and 'user' not in session:
+    if request.endpoint in ['predict_message', 'predict_url'] and 'user' not in session:
         now = datetime.now()
         if 'trial_reset_time' not in session:
             session['trial_reset_time'] = now.isoformat()
