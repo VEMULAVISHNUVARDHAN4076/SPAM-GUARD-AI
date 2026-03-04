@@ -227,5 +227,3 @@ def predict_message():
                          url_results=url_results,
                          trial_remaining = max(3 - session.get('trial_uses', 0), 0) if 'user' not in session else None)
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
