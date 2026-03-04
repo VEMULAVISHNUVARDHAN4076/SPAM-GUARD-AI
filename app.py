@@ -184,7 +184,7 @@ def predict_message():
     urls = extract_urls(message)
     url_results = []
 
-    SAFE_BROWSING_API_KEY = os.environ.get("AIzaSyA8N2UdJy_EwevmCRyAh6fHP1DoWLmP1ak")
+    SAFE_BROWSING_API_KEY = os.environ.get("GOOGLE_SAFE_BROWSING_API_KEY")
 
     if urls and SAFE_BROWSING_API_KEY:
         for url in urls:
@@ -238,7 +238,7 @@ def predict_url():
     if 'user' not in session:
         session['trial_uses'] = session.get('trial_uses', 0) + 1
 
-    SAFE_BROWSING_API_KEY = os.environ.get("AIzaSyA8N2UdJy_EwevmCRyAh6fHP1DoWLmP1ak")
+    SAFE_BROWSING_API_KEY = os.environ.get("GOOGLE_SAFE_BROWSING_API_KEY")
 
     status = "UNKNOWN"
     reason = "Could not check URL"
