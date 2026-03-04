@@ -228,4 +228,5 @@ def predict_message():
                          trial_remaining = max(3 - session.get('trial_uses', 0), 0) if 'user' not in session else None)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))  # Render uses $PORT, fallback to 5000 for local
+    app.run(host="0.0.0.0", port=port, debug=True)
