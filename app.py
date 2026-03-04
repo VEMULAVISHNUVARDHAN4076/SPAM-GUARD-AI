@@ -54,9 +54,9 @@ def enforce_trial_limit():
             return redirect(url_for('login'))
 
 def extract_urls(text):
-    pattern = r'(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:\'".,<>?«»“”‘’]))'
+    pattern = r'https?://[^\s]+|www\.[^\s]+'
     return re.findall(pattern, text)
-
+    
 def check_google_safe_browsing(url, api_key):
     endpoint = "https://safebrowsing.googleapis.com/v4/threatMatches:find"
     payload = {
