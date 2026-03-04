@@ -227,7 +227,15 @@
             <textarea name="message" placeholder="Paste or type your message here..." required></textarea>
             <button type="submit" class="btn">Check Message</button>
         </form>
-        {% if result %}
+        
+        <div class="result-box {% if is_spam %}result-spam{% else %}result-safe{% endif %} show">
+            <span class="result-icon">{% if is_spam %}⚠️{% else %}✅{% endif %}</span>
+            <div>{{ result }}</div>
+            <div class="confidence">{{ prob }}% confidence</div>
+        </div>
+        {% endif %}
+
+		{% if result %}
         <h2 style="margin-top: 3rem;">Check Single URL</h2>
 	<form action="/predict_url" method="post">
     		<input type="url" name="url" placeholder="Paste a single URL here (e.g. https://amazon.in)" required style="width:100%;padding:1rem; font-size:1.1rem; border:2px solid #e5e7eb; border-radius:1rem;">
@@ -243,13 +251,7 @@
     		</div>
 	</div>
 	{% endif %}
-        <div class="result-box {% if is_spam %}result-spam{% else %}result-safe{% endif %} show">
-            <span class="result-icon">{% if is_spam %}⚠️{% else %}✅{% endif %}</span>
-            <div>{{ result }}</div>
-            <div class="confidence">{{ prob }}% confidence</div>
-        </div>
-        {% endif %}
-
+		
         {% if url_results %}
         <div class="result-box" style="margin-top: 1.8rem; background: #fef3c7; border-color: #fbbf24; padding: 1.4rem;">
             <h3 style="color: #92400e;">⚠️ Link Safety Check (Important!)</h3>
