@@ -252,13 +252,14 @@ def predict_url():
                 reason = haus_reason
 
     return render_template("index.html",
-                           checked_url=url,
-                           url_status=status,
-                           url_reason=reason,
-                           username=session.get("user", "Guest"),
-                           is_logged_in="user" in session,
-                           trial_remaining=max(3 - session.get('trial_uses', 0), 0)
-                           if 'user' not in session else None)
+                       url_result=True,   # ✅ ADD THIS LINE
+                       checked_url=url,
+                       url_status=status,
+                       url_reason=reason,
+                       username=session.get("user", "Guest"),
+                       is_logged_in="user" in session,
+                       trial_remaining=max(3 - session.get('trial_uses', 0), 0)
+                       if 'user' not in session else None)
 
 if __name__ == "__main__":
     app.run(debug=True)
