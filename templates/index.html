@@ -223,6 +223,7 @@
               {% endif %}
             {% endwith %}
         </div>
+		
         <form action="/predict_message" method="post">
             <textarea name="message" placeholder="Paste or type your message here..." required></textarea>
             <button type="submit" class="btn">Check Message</button>
@@ -236,7 +237,6 @@
         </div>
 		{% endif %}
 		
-		{% if result %}
         <h2 style="margin-top: 3rem;">Check Single URL</h2>
 	<form action="/predict_url" method="post">
     		<input type="url" name="url" placeholder="Paste a single URL here (e.g. https://amazon.in)" required style="width:100%;padding:1rem; font-size:1.1rem; border:2px solid #e5e7eb; border-radius:1rem;">
@@ -269,7 +269,6 @@
             {% endfor %}
         </div>
         {% endif %}
-		{% endif %}
 
         <div class="examples">
             <h3>Quick Test Examples</h3>
