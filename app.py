@@ -171,8 +171,8 @@ def home():
 def predict_get():
     return redirect(url_for('home'))
     
-@app.route("/predict", methods=["POST"])
-def predict():
+@app.route("/predict_message", methods=["POST"])
+def predict_message():
     message = request.form.get("message", "").strip()
     if not message:
         flash("Please enter a message to check.", "warning")
