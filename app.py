@@ -228,4 +228,4 @@ def predict_message():
                          trial_remaining = max(3 - session.get('trial_uses', 0), 0) if 'user' not in session else None)
 
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=5500, debug=True)
+    app.run(debug=True)
