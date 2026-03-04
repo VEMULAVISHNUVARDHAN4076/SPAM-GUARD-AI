@@ -227,5 +227,38 @@ def predict_message():
                          url_results=url_results,
                          trial_remaining = max(3 - session.get('trial_uses', 0), 0) if 'user' not in session else None)
 
+@app.route("/predict_url", methods=["POST"])
+def predict_url():
+    url = request.form.get("url", "").strip()
+
+    if not url:
+        flash("Please enter a URL to check.", "warning")
+        return redirect(url_for("home"))
+
+    if 'user' not in session:
+        session['trial_uses'] = session.get('trial_uses', 0) + 1
+
+    SAFE_BROWSING_API_KEY = os.environ.get("GOOGLE_SAFE_BROWSING_API_KEY")
+
+    status = "UNKNOWN"
+    reason = "Could not check URL"
+
+    if SAFE_BROWSING_API_KEY:
+        status, reason = check_google_safe_browsing(url, SAFE_BROWSING_API_KEY)
+        if status == "SAFE":
+            is_malware, haus_reason = check_urlhaus(url)
+            if is_malware:
+                status = "MALICIOUS"
+                reason = haus_reason
+
+    return render_template("index.html",
+                           checked_url=url,
+                           url_status=status,
+                           url_reason=reason,
+                           username=session.get("user", "Guest"),
+                           is_logged_in="user" in session,
+                           trial_remaining=max(3 - session.get('trial_uses', 0), 0)
+                           if 'user' not in session else None)
+
 if __name__ == "__main__":
     app.run(debug=True)
